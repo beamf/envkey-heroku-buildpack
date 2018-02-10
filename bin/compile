@@ -18,14 +18,16 @@ if [ -f $ENV_DIR/ENVKEY ]; then
   ENVKEY_URL="https://raw.githubusercontent.com/envkey/envkey-source/master/dist/envkey-source_${ENVKEY_VERSION}_linux_amd64.tar.gz"
   echo "Downloading envkey-source ${ENVKEY_VERSION} from ${ENVKEY_URL}" | indent
   curl -s -o envkey-source.tar.gz "${ENVKEY_URL}"
-  tar zxf envkey-source.tar.gz envkey-source
+  mkdir ./bin
+  tar zxf envkey-source.tar.gz ./bin/envkey-source
 
   echo "ENVKEY config var is set" | indent
   export "ENVKEY=$(cat $ENV_DIR/ENVKEY)"
-  echo $(./envkey-source) > $BP_DIR/export
   echo "EnvKey variables exported to subsequent buildpacks" | indent
+  echo $(./bin/envkey-source) > $BP_DIR/export
   mkdir $BUILD_DIR/.profile.d
-  echo $(./envkey-source) > $BUILD_DIR/.profile.d/envkey.sh
+  echo $(./bin/envkey-source) > $BUILD_DIR/.profile.d/envkey.sh
+  echo \\nexport PATH='$PATH':$(pwd)/bin >> $BUILD_DIR/.profile.d/envkey.sh
   echo "EnvKey variables exported to running application via .profile.d/envkey.sh" | indent
 else
   echo "ENVKEY config var not set" | indent
